@@ -298,7 +298,7 @@ export default function App() {
   }, []);
 
   const fetchMovies = async () => {
-    const snap = await getDocs(query(collection(db, "movies"), orderBy("createdAt", "desc")));
+    const snap = await getDocs((collection(db, "movies"), orderBy("createdAt", "desc")));
     console.log("database se aaya data:", snap.docs.map(d => d.data())); // <-- 
     setMovies(snap.docs.map(d => ({ id: d.id, ...d.data() })));
     setLoading(false);
