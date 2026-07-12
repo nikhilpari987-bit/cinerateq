@@ -297,13 +297,17 @@ export default function App() {
     return unsub;
   }, []);
 
-  const fetchMovies = async () => {
-    const snap = await getDocs(query(collection(db, "movies"), orderBy("createdAt", "desc")));
-    console.log("database se aaya data:", snap.docs.map(d => d.data())); // <-- 
+ const fetchMovies = async () => {
+  try {
+    const snap = await getDocs(collection(db, "movies"));
+    console.log("DATABASE SE AAYA DATA:", snap.docs.map(d => d.data()));
     setMovies(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+  } catch (error) {
+    console.error("FIREBASE ERROR DETAIL:", error);
+  } finally {
     setLoading(false);
-  };
-
+  }
+};
   useEffect(() => { fetchMovies(); }, []);
 
   const signIn = async (provider) => {
