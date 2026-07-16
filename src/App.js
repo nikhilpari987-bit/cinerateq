@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { auth, db, googleProvider, appleProvider } from "./firebase";
-import { signInWithPopup, signOut, onAuthStateChanged } from "firebase/auth";
+import { signInWithPopup, signOut, updateProfile  } from "firebase/auth";
 import {
   collection, addDoc, getDocs, doc, updateDoc,
   arrayUnion, arrayRemove, query, orderBy, getDoc, setDoc, deleteDoc
@@ -390,6 +390,31 @@ export default function App() {
     try { await signInWithPopup(auth, provider); }
     catch(e) { console.error(e); }
   };
+  const handleUpdateProfile = async (newName, newPhotoUrl) => {
+  if (!auth.currentUser) return;
+
+  try {
+    // 1. Firebase Auth ke cloud server par user ka name aur photo save karega
+    await updateProfile(auth.currentUser, {
+      displayName: newName,
+      photoURL: newPhotoUrl
+    });
+
+    // 2. React ke local user state ko update karega taaki page reload kiye bina screen par changes dikhein
+    if (typeof setUser === "function") {
+      setUser({
+        ...auth.currentUser,
+        displayName: newName,
+        photoURL: newPhotoUrl
+      });
+    }
+
+    alert("Profile successfully update ho gayi hai! 🎉");
+  } catch (error) {
+    console.error("Profile update karne mein error:", error);
+    alert("Profile update nahi ho payi, console check karein.");
+  }
+};
 
   const handleRate = async (movie, score, reviewText = "") => {
     if (!user) return;
@@ -426,6 +451,23 @@ export default function App() {
               <div className="user-area">
                 {isAdmin && <button className="btn-admin" onClick={() => setShowAdmin(true)}>+ Add Movie</button>}
                 <img src={user.photoURL || ""} alt="" className="avatar" onError={e => e.target.style.display="none"} />
+                <button 
+  className="btn-admin" 
+  style={{ marginRight: "10px", padding: "6px 12px", cursor: "pointer" }}
+  onClick={() => {
+    const newName = prompt("Apna naya naam likhiye:", user?.displayName || "");
+    const newPhoto = prompt("Apni nayi photo ka web URL daliye:", user?.photoURL || "");
+    
+    if (newName !== null || newPhoto !== null) {
+      handleUpdateProfile(
+        newName || user?.displayName || "Nikhil125", 
+        newPhoto || user?.photoURL || ""
+      );
+    }
+  }}
+>
+  ✏️ Edit Profile
+</button>
                 <span className="user-name">{user.displayName?.split(" ")[0]}</span>
                 <button className="btn-signout" onClick={() => signOut(auth)}>Sign Out</button>
               </div>
