@@ -456,30 +456,29 @@ export default function App() {
         <div className="header-inner">
           <div className="logo">CINE<span>RATE</span></div>
           <div className="header-right">
-            {user ? (
-              <div className="user-area">
-                {isAdmin && <button className="btn-admin" onClick={() => setShowAdmin(true)}>+ Add Movie</button>}
-                <img src={user.photoURL || ""} alt="" className="avatar" onError={e => e.target.style.display="none"} />
-              <button 
-  className="btn-admin" 
-  style={{ marginRight: "10px", padding: "6px 12px", cursor: "pointer" }}
-  onClick={() => {
-    const newName = prompt("Apna naya naam likhiye:", user?.displayName || "");
-    const newPhoto = prompt("Apni nayi photo ka web URL daliye:", user?.photoURL || "");
+           {user ? (
+  <div className="user-area">
+    {isAdmin && <button className="btn-admin" onClick={() => setShowAdmin(true)}>+ Add Movie</button>}
+    <img src={user.photoURL || ""} alt="" className="avatar" onError={(e) => e.target.style.display="none"} />
+    <span className="user-name">{user.displayName?.split(" ")[0]}</span>
     
-    if (newName !== null || newPhoto !== null) {
-      handleUpdateProfile(
-        newName || user?.displayName || "User", 
-        newPhoto || user?.photoURL || ""
-      );
-    }
-  }}
->
-  ✏️ Edit Profile
-</button>
-                <span className="user-name">{user.displayName?.split(" ")[0]}</span>
-                <button className="btn-signout" onClick={() => signOut(auth)}>Sign Out</button>
-              </div>
+    <button 
+      className="btn-admin" 
+      style={{ marginRight: "10px", padding: "6px 12px", cursor: "pointer", backgroundColor: "#ffb300", color: "#000", border: "none", borderRadius: "4px" }}
+      onClick={() => {
+        const newName = prompt("Apna naya naam likhiye:", user?.displayName || "");
+        const newPhoto = prompt("Apni nayi photo ka web URL daliye:", user?.photoURL || "");
+        if (newName !== null || newPhoto !== null) {
+          handleUpdateProfile(newName || user?.displayName, newPhoto || user?.photoURL);
+        }
+      }}
+    >
+      ✏️ Edit Profile
+    </button>
+
+    <button className="btn-signout" onClick={() => signOut(auth)}>Sign Out</button>
+  </div>
+) : (
             ) : (
               <div className="auth-btns">
                 <button className="btn-google" onClick={() => signIn(googleProvider)}>
