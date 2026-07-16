@@ -390,31 +390,40 @@ export default function App() {
     try { await signInWithPopup(auth, provider); }
     catch(e) { console.error(e); }
   };
-  const handleUpdateProfile = async (newName, newPhotoUrl) => {
-  if (!auth.currentUser) return;
+ const handleUpdateProfile = async (newName, newPhotoUrl) => {
+  const currentUser = auth.currentUser;
+  
+  // Agar koi user login nahi hai, toh yeh aage nahi badhega
+  if (!currentUser) {
+    alert("Pehle sign in kijiye!");
+    return;
+  }
 
   try {
-    // 1. Firebase Auth ke cloud server par user ka name aur photo save karega
-    await updateProfile(auth.currentUser, {
+    // 1. Firebase Server par user ka naya name aur photo save karega
+    await updateProfile(currentUser, {
       displayName: newName,
       photoURL: newPhotoUrl
     });
 
-    // 2. React ke local user state ko update karega taaki page reload kiye bina screen par changes dikhein
+    // 2. Local state (setUser) ko update karega taaki screen par turant badlaav dikhe
     if (typeof setUser === "function") {
       setUser({
-        ...auth.currentUser,
+        ...currentUser,
         displayName: newName,
-        photoURL: newPhotoUrl
+        photoURL: newPhotoUrl,
+        uid: currentUser.uid,
+        email: currentUser.email
       });
     }
 
     alert("Profile successfully update ho gayi hai! 🎉");
   } catch (error) {
-    console.error("Profile update karne mein error:", error);
+    console.error("Profile update error:", error);
     alert("Profile update nahi ho payi, console check karein.");
   }
 };
+
 
   const handleRate = async (movie, score, reviewText = "") => {
     if (!user) return;
@@ -451,7 +460,7 @@ export default function App() {
               <div className="user-area">
                 {isAdmin && <button className="btn-admin" onClick={() => setShowAdmin(true)}>+ Add Movie</button>}
                 <img src={user.photoURL || ""} alt="" className="avatar" onError={e => e.target.style.display="none"} />
-                <button 
+              <button 
   className="btn-admin" 
   style={{ marginRight: "10px", padding: "6px 12px", cursor: "pointer" }}
   onClick={() => {
@@ -460,22 +469,7 @@ export default function App() {
     
     if (newName !== null || newPhoto !== null) {
       handleUpdateProfile(
-        newName || user?.displayName || "Nikhil125", 
-        newPhoto || user?.photoURL || ""
-      );
-    }
-  }}
->
- <button 
-  className="btn-admin" 
-  style={{ marginRight: "10px", padding: "6px 12px", cursor: "pointer" }}
-  onClick={() => {
-    const newName = prompt("Apna naya naam likhiye:", user?.displayName || "");
-    const newPhoto = prompt("Apni nayi photo ka web URL daliye:", user?.photoURL || "");
-    
-    if (newName !== null || newPhoto !== null) {
-      handleUpdateProfile(
-        newName || user?.displayName || "Nikhil125", 
+        newName || user?.displayName || "User", 
         newPhoto || user?.photoURL || ""
       );
     }
