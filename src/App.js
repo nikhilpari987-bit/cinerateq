@@ -466,6 +466,21 @@ export default function App() {
     }
   }}
 >
+ <button 
+  className="btn-admin" 
+  style={{ marginRight: "10px", padding: "6px 12px", cursor: "pointer" }}
+  onClick={() => {
+    const newName = prompt("Apna naya naam likhiye:", user?.displayName || "");
+    const newPhoto = prompt("Apni nayi photo ka web URL daliye:", user?.photoURL || "");
+    
+    if (newName !== null || newPhoto !== null) {
+      handleUpdateProfile(
+        newName || user?.displayName || "Nikhil125", 
+        newPhoto || user?.photoURL || ""
+      );
+    }
+  }}
+>
   ✏️ Edit Profile
 </button>
                 <span className="user-name">{user.displayName?.split(" ")[0]}</span>
