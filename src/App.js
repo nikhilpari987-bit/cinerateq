@@ -451,50 +451,43 @@ export default function App() {
   });
 
   return (
-    <div className="app">
+ <div className="app">
       <header className="header">
         <div className="header-inner">
           <div className="logo">CINE<span>RATE</span></div>
+          
           <div className="header-right">
-           {user ? (
-  <div className="user-area">
-    {isAdmin && <button className="btn-admin" onClick={() => setShowAdmin(true)}>+ Add Movie</button>}
-    <img src={user.photoURL || ""} alt="" className="avatar" onError={(e) => e.target.style.display="none"} />
-    <span className="user-name">{user.displayName?.split(" ")[0]}</span>
-    
-    <button 
-      className="btn-admin" 
-      style={{ marginRight: "10px", padding: "6px 12px", cursor: "pointer", backgroundColor: "#ffb300", color: "#000", border: "none", borderRadius: "4px" }}
-      onClick={() => {
-        const newName = prompt("Apna naya naam likhiye:", user?.displayName || "");
-        const newPhoto = prompt("Apni nayi photo ka web URL daliye:", user?.photoURL || "");
-        if (newName !== null || newPhoto !== null) {
-          handleUpdateProfile(newName || user?.displayName, newPhoto || user?.photoURL);
-        }
-      }}
-    >
-      ✏️ Edit Profile
-    </button>
+            {user ? (
+              <div className="user-area">
+                {isAdmin && <button className="btn-admin" onClick={() => setShowAdmin(true)}>+ Add Movie</button>}
+                <img src={user.photoURL || ""} alt="" className="avatar" onError={(e) => e.target.style.display="none"} />
+                <span className="user-name">{user.displayName?.split(" ")[0]}</span>
+                
+                <button 
+                  className="btn-admin" 
+                  style={{ marginRight: "10px", padding: "6px 12px", cursor: "pointer", backgroundColor: "#ffb300", color: "#000000", border: "none", borderRadius: "4px", fontWeight: "600" }}
+                  onClick={() => {
+                    const newName = prompt("Apna naya naam likhiye:", user?.displayName || "");
+                    const newPhoto = prompt("Apni nayi photo ka web URL daliye:", user?.photoURL || "");
+                    if (newName !== null || newPhoto !== null) {
+                      handleUpdateProfile(newName || user?.displayName, newPhoto || user?.photoURL);
+                    }
+                  }}
+                >
+                  ✏️ Edit Profile
+                </button>
 
-    <button className="btn-signout" onClick={() => signOut(auth)}>Sign Out</button>
-  </div>
-) : (
+                <button className="btn-signout" onClick={() => signOut(auth)}>Sign Out</button>
+              </div>
             ) : (
               <div className="auth-btns">
-                <button className="btn-google" onClick={() => signIn(googleProvider)}>
-                  <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/><path fill="#FBBC05" d="M3.964 10.706c-.18-.54-.282-1.117-.282-1.706s.102-1.166.282-1.706V4.962H.957C.347 6.175 0 7.548 0 9s.348 2.825.957 4.038l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.962L3.964 7.294C4.672 5.163 6.656 3.58 9 3.58z"/></svg>
-                  Google
-                </button>
-                <button className="btn-apple" onClick={() => signIn(appleProvider)}>
-                  <svg width="17" height="18" viewBox="0 0 814 1000"><path fill="white" d="M788.1 340.9c-5.8 4.5-108.2 62.2-108.2 190.5 0 148.4 130.3 200.9 134.2 202.2-.6 3.2-20.7 71.9-68.7 141.9-42.8 61.6-87.5 123.1-155.5 123.1s-85.5-39.5-164-39.5c-76 0-103.7 40.8-165.9 40.8s-105-57.8-155.5-127.4C46 376.6 0 289.2 0 186.3c0-163.7 107-250.3 211.4-250.3 79.4 0 144.5 52.4 184.5 52.4 38.2 0 114.4-55.4 203.2-55.4 32.5 0 134.2 3.2 208 99.9zm-251.1-185.8c38.2-46.2 64.8-110.1 64.8-173.9 0-8.9-.6-17.8-1.9-25.4-61 2.6-133.6 41.5-177.1 94.6-34.7 40.8-66.5 104.7-66.5 170.1 0 9.6 1.9 19.2 2.6 22.4 3.9.6 10.3 1.3 16.5 1.3 55.7 0 123.8-38.2 161.6-88.1z"/></svg>
-                  Apple
-                </button>
+                <button className="btn-google" onClick={() => signIn(googleProvider)}>Google</button>
+                <button className="btn-apple" onClick={() => signIn(appleProvider)}>Apple</button>
               </div>
             )}
           </div>
         </div>
       </header>
-
       <div className="hero">
         <div className="hero-inner">
           <h1 className="hero-title">TRACK. RATE.<br/><span>SHARE.</span></h1>
