@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { auth, db, googleProvider, appleProvider } from "./firebase";
-import { signInWithPopup, signOut, updateProfile  } from "firebase/auth";
+import { signInWithRedirect, signOut, updateProfile  } from "firebase/auth";
 import {
   collection, addDoc, getDocs, doc, updateDoc,
   arrayUnion, arrayRemove, query, orderBy, getDoc, setDoc, deleteDoc
@@ -387,7 +387,7 @@ export default function App() {
   useEffect(() => { fetchMovies(); }, []);
 
   const signIn = async (provider) => {
-    try { await signInWithPopup(auth, provider); }
+    try { await signInWithRedirect(auth, provider); }
     catch(e) { console.error(e); }
   };
  const handleUpdateProfile = async (newName, newPhotoUrl) => {
