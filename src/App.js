@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { auth, db, googleProvider, appleProvider } from "./firebase";
-import { signInWithRedirect, signOut, updateProfile  } from "firebase/auth";
+import { signInWithRedirect, signOut, updateProfile, onAuthStateChanged } from "firebase/auth";
 import {
   collection, addDoc, getDocs, doc, updateDoc,
   arrayUnion, arrayRemove, query, orderBy, getDoc, setDoc, deleteDoc
