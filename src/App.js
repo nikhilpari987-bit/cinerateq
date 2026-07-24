@@ -8,6 +8,7 @@ import {
 import html2canvas from "html2canvas";
 import "./index.css";
 import "./App.css";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 const ADMIN_EMAILS = (process.env.REACT_APP_ADMIN_EMAILS || "").split(",").map(e => e.trim());
 
@@ -423,6 +424,26 @@ export default function App() {
     alert("Profile update nahi ho payi, console check karein.");
   }
 };
+const handlePhotoChange = async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const storage = getStorage();
+  const storageRef = ref(storage, `profile_pictures/${auth.currentUser.uid}`);
+
+  try {
+    alert("Photo upload ho rahi hai, kripya thoda intezar karein...");
+    await uploadBytes(storageRef, file);
+    const downloadURL = await getDownloadURL(storageRef);
+    await updateProfile(auth.currentUser, { photoURL: downloadURL });
+    alert("Profile photo kamyabi se badal gayi hai! 🎉");
+    window.location.reload(); 
+  } catch (error) {
+    console.error("Photo upload karne mein error aaya:", error);
+    alert("Kuch gadbad hui! Firebase Console mein check karein ki Storage enable hai ya nahi.");
+  }
+};
+
 
 
   const handleRate = async (movie, score, reviewText = "") => {
@@ -464,20 +485,37 @@ export default function App() {
                 <span className="user-name">{user.displayName?.split(" ")[0]}</span>
                 
                 <button 
-                  className="btn-admin" 
-                  style={{ marginRight: "10px", padding: "6px 12px", cursor: "pointer", backgroundColor: "#ffb300", color: "#000000", border: "none", borderRadius: "4px", fontWeight: "600" }}
-                  onClick={() => {
-                    const newName = prompt("Apna naya naam likhiye:", user?.displayName || "");
-                    const newPhoto = prompt("Apni nayi photo ka web URL daliye:", user?.photoURL || "");
-                    if (newName !== null || newPhoto !== null) {
-                      handleUpdateProfile(newName || user?.displayName, newPhoto || user?.photoURL);
-                    }
-                  }}
-                >
-                  ✏️ Edit Profile
-                </button>
+                
+              className="btn-admin"
+              style={{ marginRight: "10px", padding: "6px 12px", cursor: "pointer", backgroundColor: "#333", color: "#fff", border: "1px solid #555", borderRadius: "4px" }}
+              onClick={() => {
+                const newName = prompt("Apna naya naam likhiye:", user?.displayName || "");
+                if (newName !== null) {
+                  handleUpdateProfile(newName || user?.displayName, user?.photoURL);
+                }
+              }}
+            >
+              ✏️ Edit Name
+            </button>
+          {/* 👇 YAHAN PASTE KARNA HAI GALLERY BUTTON */}
+          <input 
+            type="file" 
+            accept="image/*" 
+            onChange={handlePhotoChange} 
+            style={{ display: 'none' }} 
+            id="gallery-input"
+          />
+          <button 
+            className="btn-admin"
+            style={{ marginRight: "10px", padding: "6px 12px", cursor: "pointer", backgroundColor: "#0070f3", color: "#fff", border: "none", borderRadius: "4px" }}
+            onClick={() => document.getElementById('gallery-input').click()}
+          >
+            📷 Change Photo
+          </button>
 
-                <button className="btn-signout" onClick={() => signOut(auth)}>Sign Out</button>
+          {/* 👆 YAHAN TAK PASTE KARNA HAI */}
+
+          <button className="btn-signout" onClick={() => signOut(auth)}>Sign Out</button>
               </div>
             ) : (
               <div className="auth-btns">
