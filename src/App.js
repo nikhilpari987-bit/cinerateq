@@ -430,26 +430,39 @@ const handlePhotoChange = (e) => {
     if (!file) return;
 
     const reader = new FileReader();
-    reader.onloadend = async () => {
-      const base64Photo = reader.result;
-      try {
+    reader.onload = (event) => {
+      const img = new Image();
+      img.src = event.target.result;
+
+      img.onload = () => {
+        // Photo ko compress/resize karne ke liye canvas format
+        const canvas = document.createElement("canvas");
+        const MAX_WIDTH = 200; // Small size for fast upload
+        const scaleFactor = MAX_WIDTH / img.width;
+        canvas.width = MAX_WIDTH;
+        canvas.height = img.height * scaleFactor;
+
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+        // Compressed Base64 String
+        const compressedBase64 = canvas.toDataURL("image/jpeg", 0.7);
+
         if (auth.currentUser) {
-          // Firebase auth profile update
-          await updateProfile(auth.currentUser, { photoURL: base64Photo });
-          
-          // React state instant update (bina reload ke photo change dikhegi)
-          setUser({ ...auth.currentUser, photoURL: base64Photo });
-          
-          alert("Profile photo kamyabi se badal gayi hai! 🎉");
+          updateProfile(auth.currentUser, { photoURL: compressedBase64 })
+            .then(() => {
+              setUser({ ...auth.currentUser, photoURL: compressedBase64 });
+              alert("Profile photo kamyabi se badal gayi hai! 🎉");
+            })
+            .catch((err) => {
+              console.error("Firebase update error:", err);
+              alert("Error: " + err.message);
+            });
         }
-      } catch (error) {
-        console.error("Photo update error:", error);
-        alert("Photo update karne mein gadbad hui.");
-      }
+      };
     };
     reader.readAsDataURL(file);
   };
-
 
 
   const handleRate = async (movie, score, reviewText = "") => {
