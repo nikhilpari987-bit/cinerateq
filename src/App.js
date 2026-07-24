@@ -366,6 +366,7 @@ export default function App() {
   const [showAdmin, setShowAdmin] = useState(false);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("All");
+  const [showProfileModal, setShowProfileModal] = useState(false);
 
   const isAdmin = user && ADMIN_EMAILS.includes(user.email);
 
@@ -476,51 +477,33 @@ const handlePhotoChange = async (e) => {
       <header className="header">
         <div className="header-inner">
           <div className="logo">CINE<span>RATE</span></div>
-          
+
           <div className="header-right">
             {user ? (
-              <div className="user-area">
+              <div className="user-area" style={{ display: "flex", alignItems: "center", gap: "12px" }}>
                 {isAdmin && <button className="btn-admin" onClick={() => setShowAdmin(true)}>+ Add Movie</button>}
-                <img src={user.photoURL || ""} alt="" className="avatar" onError={(e) => e.target.style.display="none"} />
-                <span className="user-name">{user.displayName?.split(" ")[0]}</span>
                 
-                <button 
-                
-              className="btn-admin"
-              style={{ marginRight: "10px", padding: "6px 12px", cursor: "pointer", backgroundColor: "#333", color: "#fff", border: "1px solid #555", borderRadius: "4px" }}
-              onClick={() => {
-                const newName = prompt("Apna naya naam likhiye:", user?.displayName || "");
-                if (newName !== null) {
-                  handleUpdateProfile(newName || user?.displayName, user?.photoURL);
-                }
-              }}
-            >
-              ✏️ Edit Name
-            </button>
-          {/* 👇 YAHAN PASTE KARNA HAI GALLERY BUTTON */}
-          <input 
-            type="file" 
-            accept="image/*" 
-            onChange={handlePhotoChange} 
-            style={{ display: 'none' }} 
-            id="gallery-input"
-          />
-          <button 
-            className="btn-admin"
-            style={{ marginRight: "10px", padding: "6px 12px", cursor: "pointer", backgroundColor: "#0070f3", color: "#fff", border: "none", borderRadius: "4px" }}
-            onClick={() => document.getElementById('gallery-input').click()}
-          >
-            📷 Change Photo
-          </button>
+                {/* Tap here to open Profile Card */}
+                <div 
+                  onClick={() => setShowProfileModal(true)} 
+                  style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}
+                >
+                  <img 
+                    src={user.photoURL || "https://via.placeholder.com/150"} 
+                    alt="Profile" 
+                    style={{ width: "36px", height: "36px", borderRadius: "50%", objectFit: "cover", border: "2px solid #e5a00d" }} 
+                  />
+                  <span className="user-name" style={{ color: "#fff", fontWeight: "600" }}>
+                    {user.displayName?.split(" ")[0]}
+                  </span>
+                </div>
 
-          {/* 👆 YAHAN TAK PASTE KARNA HAI */}
-
-          <button className="btn-signout" onClick={() => signOut(auth)}>Sign Out</button>
+                <button className="btn-signout" onClick={() => signOut(auth)}>Sign Out</button>
               </div>
             ) : (
               <div className="auth-btns">
-                <button className="btn-google" onClick={() => signIn(googleProvider)}>Google</button>
-                <button className="btn-apple" onClick={() => signIn(appleProvider)}>Apple</button>
+                <button className="btn-google" onClick={() => signInWithRedirect(auth, googleProvider)}>Google</button>
+                <button className="btn-apple" onClick={() => signInWithRedirect(auth, appleProvider)}>Apple</button>
               </div>
             )}
           </div>
@@ -589,6 +572,102 @@ const handlePhotoChange = async (e) => {
       {showAdmin && isAdmin && (
         <AdminPanel onAdd={handleAddMovie} onClose={() => setShowAdmin(false)} />
       )}
+
+      {/* --- MOCTALE STYLE DEDICATED PROFILE MODAL --- */}
+      {showProfileModal && (
+        <div style={{
+          position: "fixed", top: 0, left: 0, width: "100%", height: "100%",
+          backgroundColor: "rgba(0,0,0,0.85)", display: "flex", justifyContent: "center",
+          alignItems: "center", zIndex: 1000, padding: "20px"
+        }}>
+          <div style={{
+            backgroundColor: "#121212", width: "100%", maxWidth: "400px", borderRadius: "16px",
+            padding: "24px", color: "#fff", position: "relative", border: "1px solid #222"
+          }}>
+            {/* ✕ Close Button */}
+            <button 
+              onClick={() => setShowProfileModal(false)}
+              style={{ position: "absolute", top: "16px", right: "16px", background: "none", border: "none", color: "#888", fontSize: "20px", cursor: "pointer" }}
+            >
+              ✕
+            </button>
+
+            {/* Top Section: Photo + Stats */}
+            <div style={{ display: "flex", alignItems: "center", gap: "20px", marginBottom: "20px" }}>
+              {/* Profile Image & Camera Badge */}
+              <div style={{ position: "relative" }}>
+                <img 
+                  src={user?.photoURL || "https://via.placeholder.com/150"} 
+                  alt="Profile" 
+                  style={{ width: "80px", height: "80px", borderRadius: "50%", objectFit: "cover", border: "2px solid #333" }} 
+                />
+                {/* Camera Button to Change Photo */}
+                <button 
+                  onClick={() => document.getElementById('modal-gallery-input').click()}
+                  style={{
+                    position: "absolute", bottom: "0", right: "0", backgroundColor: "#0070f3",
+                    border: "none", borderRadius: "50%", width: "28px", height: "28px",
+                    color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+                    fontSize: "12px"
+                  }}
+                  title="Change Photo"
+                >
+                  📷
+                </button>
+              </div>
+
+              {/* Reviews and Stats */}
+              <div style={{ display: "flex", gap: "24px", textAlign: "center" }}>
+                <div>
+                  <div style={{ fontSize: "18px", fontWeight: "bold" }}>0</div>
+                  <div style={{ fontSize: "12px", color: "#888" }}>Reviews</div>
+                </div>
+                <div>
+                  <div style={{ fontSize: "18px", fontWeight: "bold" }}>0</div>
+                  <div style={{ fontSize: "12px", color: "#888" }}>Collections</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Hidden File Input for Gallery */}
+            <input 
+              type="file" 
+              accept="image/*" 
+              id="modal-gallery-input"
+              onChange={handlePhotoChange} 
+              style={{ display: "none" }} 
+            />
+
+            {/* User Details */}
+            <div style={{ marginBottom: "20px" }}>
+              <h2 style={{ fontSize: "20px", margin: "0 0 4px 0", fontWeight: "bold" }}>
+                {user?.displayName || "User Name"}
+              </h2>
+              <p style={{ color: "#888", margin: 0, fontSize: "14px" }}>
+                @{user?.email?.split("@")[0]}
+              </p>
+            </div>
+
+            {/* Edit Name Button */}
+            <button 
+              onClick={() => {
+                const newName = prompt("Apna naya naam likhiye:", user?.displayName || "");
+                if (newName !== null) {
+                  handleUpdateProfile(newName || user?.displayName, user?.photoURL);
+                }
+              }}
+              style={{
+                width: "100%", padding: "12px", backgroundColor: "#262626", color: "#fff",
+                border: "1px solid #333", borderRadius: "8px", fontWeight: "600", cursor: "pointer"
+              }}
+            >
+              Edit Profile Name
+            </button>
+
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
