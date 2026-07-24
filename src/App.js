@@ -483,9 +483,17 @@ const handlePhotoChange = (e) => {
   };
 
   const genres = ["All", ...Array.from(new Set(movies.map(m => m.genre).filter(Boolean)))];
-  const filtered = movies.filter(m => {
-    const matchSearch = m.title.toLowerCase().includes(search.toLowerCase()) || m.director?.toLowerCase().includes(search.toLowerCase());
-    const matchGenre = filter === "All" || m.genre === filter;
+  const filtered = movies.filter((m) => {
+    const movieTitle = m?.title || "";
+    const movieDirector = m?.director || "";
+    const movieGenre = m?.genre || "";
+
+    const matchSearch =
+      movieTitle.toLowerCase().includes(search.toLowerCase()) ||
+      movieDirector.toLowerCase().includes(search.toLowerCase());
+
+    const matchGenre = filter === "All" || movieGenre === filter;
+
     return matchSearch && matchGenre;
   });
 
