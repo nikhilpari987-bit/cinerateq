@@ -425,25 +425,30 @@ export default function App() {
     alert("Profile update nahi ho payi, console check karein.");
   }
 };
-const handlePhotoChange = async (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
+const handlePhotoChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
 
-  const storage = getStorage();
-  const storageRef = ref(storage, `profile_pictures/${auth.currentUser.uid}`);
-
-  try {
-    alert("Photo upload ho rahi hai, kripya thoda intezar karein...");
-    await uploadBytes(storageRef, file);
-    const downloadURL = await getDownloadURL(storageRef);
-    await updateProfile(auth.currentUser, { photoURL: downloadURL });
-    alert("Profile photo kamyabi se badal gayi hai! 🎉");
-    window.location.reload(); 
-  } catch (error) {
-    console.error("Photo upload karne mein error aaya:", error);
-    alert("Kuch gadbad hui! Firebase Console mein check karein ki Storage enable hai ya nahi.");
-  }
-};
+    const reader = new FileReader();
+    reader.onloadend = async () => {
+      const base64Photo = reader.result;
+      try {
+        if (auth.currentUser) {
+          // Firebase auth profile update
+          await updateProfile(auth.currentUser, { photoURL: base64Photo });
+          
+          // React state instant update (bina reload ke photo change dikhegi)
+          setUser({ ...auth.currentUser, photoURL: base64Photo });
+          
+          alert("Profile photo kamyabi se badal gayi hai! 🎉");
+        }
+      } catch (error) {
+        console.error("Photo update error:", error);
+        alert("Photo update karne mein gadbad hui.");
+      }
+    };
+    reader.readAsDataURL(file);
+  };
 
 
 
