@@ -142,42 +142,56 @@ function ShareCard({ movie, userRating, userName, userPhoto, onClose }) {
               }}>
                 {"★".repeat(userRating)}{"☆".repeat(5 - userRating)}
               </div>
+            </div>
+          </div>
 
-              {/* User Profile Info */}
-              <div style={{ display: "flex", alignItems: "center", gap: "10px", marginTop: "auto" }}>
-                {userPhoto ? (
-                  <img
-                    src={userPhoto}
-                    alt="Profile"
-                    style={{
-                      width: "36px",
-                      height: "36px",
-                      borderRadius: "50%",
-                      objectFit: "cover"
-                    }}
-                  />
-                ) : (
-                  <div
-                    style={{
-                      width: "36px",
-                      height: "36px",
-                      borderRadius: "50%",
-                      backgroundColor: "#333",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontSize: "14px",
-                      fontWeight: "bold",
-                      color: "#fff"
-                    }}
-                  >
-                    {userName ? userName.charAt(0).toUpperCase() : "U"}
-                  </div>
-                )}
-                <span style={{ fontWeight: "600", fontSize: "14px", color: "#ffffff" }}>
-                  @{userName}
-                </span>
-              </div>
+          {/* Divider Line */}
+          <div style={{ height: "1px", backgroundColor: "#222", margin: "4px 0" }}></div>
+
+          {/* Bottom Footer: User Info & CINERATE Branding */}
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            {/* Left: User Avatar & Username */}
+            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+              {userPhoto ? (
+                <img
+                  src={userPhoto}
+                  alt="Profile"
+                  style={{
+                    width: "36px",
+                    height: "36px",
+                    borderRadius: "50%",
+                    objectFit: "cover"
+                  }}
+                />
+              ) : (
+                <div
+                  style={{
+                    width: "36px",
+                    height: "36px",
+                    borderRadius: "50%",
+                    backgroundColor: "#333",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: "14px",
+                    fontWeight: "bold",
+                    color: "#fff"
+                  }}
+                >
+                  {userName ? userName.charAt(0).toUpperCase() : "U"}
+                </div>
+              )}
+              <span style={{ fontWeight: "600", fontSize: "14px", color: "#ffffff" }}>
+                @{userName}
+              </span>
+            </div>
+
+            {/* Right: Branding Logo */}
+            <div style={{ display: "flex", alignItems: "center", gap: "6px", opacity: 0.9 }}>
+              <span style={{ fontSize: "16px" }}>🎬</span>
+              <span style={{ fontWeight: "800", fontSize: "15px", letterSpacing: "1.5px", color: "#ffffff" }}>
+                CINERATE
+              </span>
             </div>
           </div>
         </div>
@@ -195,7 +209,6 @@ function ShareCard({ movie, userRating, userName, userPhoto, onClose }) {
     </div>
   );
 }
-
 function MovieCard({ movie, user, onRate, onOpen }) {
   const avgRating = movie.ratings && movie.ratings.length > 0
     ? (movie.ratings.reduce((a, b) => a + b.score, 0) / movie.ratings.length).toFixed(1)
