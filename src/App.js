@@ -35,149 +35,162 @@ function StarRating({ value, onChange, size = 28, readonly = false }) {
   );
 }
 
-function ShareCard({ movie, userRating, userName, onClose }) {
+function ShareCard({ movie, userRating, userName, userPhoto, onClose }) {
   const cardRef = React.useRef();
   const [sharing, setSharing] = useState(false);
 
   const downloadCard = async () => {
     setSharing(true);
     try {
-      const canvas = await html2canvas(cardRef.current, { scale: 2, useCORS: true, backgroundColor: "#0d0d0f" });
+      const canvas = await html2canvas(cardRef.current, { scale: 2, useCORS: true, backgroundColor: null });
       const link = document.createElement("a");
       link.download = `${movie.title}-rating.png`;
       link.href = canvas.toDataURL("image/png");
       link.click();
-    } catch(e) { console.error(e); }
+    } catch (e) {
+      console.error(e);
+    }
     setSharing(false);
   };
 
   const shareWhatsApp = async () => {
     setSharing(true);
     try {
-      const canvas = await html2canvas(cardRef.current, { scale: 2, useCORS: true, backgroundColor: "#0d0d0f" });
+      const canvas = await html2canvas(cardRef.current, { scale: 2, useCORS: true, backgroundColor: null });
       canvas.toBlob(async (blob) => {
-        if (navigator.share && navigator.canShare({ files: [new File([blob], "rating.png", { type: "image/png" })] })) {
+        if (navigator.share && navigator.canShare && navigator.canShare({ files: [new File([blob], "rating.png", { type: "image/png" })] })) {
           await navigator.share({
             title: `I rated ${movie.title}`,
             text: `I gave ${movie.title} ${userRating}/5 stars! Check it out on CineRate.`,
             files: [new File([blob], "rating.png", { type: "image/png" })]
           });
         } else {
-          const text = `I gave ${movie.title} ${"★".repeat(userRating)}${"☆".repeat(5-userRating)} on CineRate!`;
+          const text = `I gave ${movie.title} ${"★".repeat(userRating)}${"☆".repeat(5 - userRating)}. Check it out on CineRate!`;
           window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
         }
         setSharing(false);
       }, "image/png");
-    } catch(e) { setSharing(false); }
+    } catch (e) {
+      console.error(e);
+      setSharing(false);
+    }
   };
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-box" onClick={e => e.stopPropagation()}>
+      <div className="modal-box" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h2>Share Your Rating</h2>
           <button className="icon-btn" onClick={onClose}>✕</button>
         </div>
 
-       <div 
-        ref={cardRef} 
-        style={{
-          width: "420px",
-          backgroundColor: "#121212",
-          borderRadius: "16px",
-          padding: "24px",
-          display: "flex",
-          flexDirection: "column",
-          gap: "20px",
-          fontFamily: "system-ui, -apple-system, sans-serif",
-          color: "#ffffff",
-          boxShadow: "0 10px 30px rgba(0,0,0,0.5)",
-          boxSizing: "border-box"
-        }}
-      >
-        {/* Main Horizontal Section */}
-        <div style={{ display: "flex", gap: "20px", alignItems: "flex-start" }}>
-          
-          {/* Left Side: Clear Movie Poster */}
-          {movie.posterUrl && (
-            <img 
-              src={movie.posterUrl} 
-              alt={movie.title} 
-              style={{
-                width: "140px",
-                height: "200px",
-                borderRadius: "8px",
-                objectFit: "cover",
-                boxShadow: "0 4px 15px rgba(0,0,0,0.4)"
-              }}
-            />
-          )}
+        <div
+          ref={cardRef}
+          style={{
+            width: "420px",
+            backgroundColor: "#121212",
+            borderRadius: "16px",
+            padding: "24px",
+            display: "flex",
+            flexDirection: "column",
+            gap: "20px",
+            fontFamily: "system-ui, -apple-system, sans-serif",
+            color: "#ffffff",
+            boxShadow: "0 10px 30px rgba(0,0,0,0.5)",
+            boxSizing: "border-box"
+          }}
+        >
+          {/* Main Horizontal Section */}
+          <div style={{ display: "flex", gap: "20px", alignItems: "flex-start" }}>
+            {/* Left Side: Movie Poster */}
+            {movie.posterUrl && (
+              <img
+                src={movie.posterUrl}
+                alt={movie.title}
+                style={{
+                  width: "140px",
+                  height: "200px",
+                  borderRadius: "8px",
+                  objectFit: "cover",
+                  boxShadow: "0 4px 15px rgba(0,0,0,0.4)"
+                }}
+              />
+            )}
 
-          {/* Right Side: Movie Details */}
-          <div style={{ display: "flex", flexDirection: "column", flex: 1, paddingTop: "4px" }}>
-            <h2 style={{ fontSize: "24px", margin: "0 0 4px 0", fontWeight: "700", lineHeight: "1.2" }}>
-              {movie.title}
-            </h2>
-            <p style={{ fontSize: "14px", color: "#888888", margin: "0 0 20px 0" }}>
-              Movie • {movie.year || "2026"}
-            </p>
+            {/* Right Side: Movie Details */}
+            <div style={{ display: "flex", flexDirection: "column", flex: 1, paddingTop: "4px" }}>
+              <h2 style={{ fontSize: "24px", margin: "0 0 4px 0", fontWeight: "700", lineHeight: "1.2" }}>
+                {movie.title}
+              </h2>
+              <p style={{ fontSize: "14px", color: "#888888", margin: "0 0 20px 0" }}>
+                Movie • {movie.year || "2026"}
+              </p>
 
-            {/* Rating Stars/Badge (Yellow Button) */}
-            <div style={{
-              backgroundColor: "#ffb300",
-              color: "#000000",
-              padding: "8px 16px",
-              borderRadius: "20px",
-              fontWeight: "700",
-              fontSize: "14px",
-              letterSpacing: "1px",
-              textAlign: "center",
-              display: "inline-block",
-              width: "fit-content",
-              marginBottom: "12px"
-            }}>
-              {"★".repeat(userRating)}{"☆".repeat(5 - userRating)}
+              {/* Rating Stars/Badge */}
+              <div style={{
+                backgroundColor: "#ffb300",
+                color: "#000000",
+                padding: "8px 16px",
+                borderRadius: "20px",
+                fontWeight: "700",
+                fontSize: "14px",
+                letterSpacing: "1px",
+                textAlign: "center",
+                display: "inline-block",
+                width: "fit-content",
+                marginBottom: "20px"
+              }}>
+                {"★".repeat(userRating)}{"☆".repeat(5 - userRating)}
+              </div>
+
+              {/* User Profile Info */}
+              <div style={{ display: "flex", alignItems: "center", gap: "10px", marginTop: "auto" }}>
+                {userPhoto ? (
+                  <img
+                    src={userPhoto}
+                    alt="Profile"
+                    style={{
+                      width: "36px",
+                      height: "36px",
+                      borderRadius: "50%",
+                      objectFit: "cover"
+                    }}
+                  />
+                ) : (
+                  <div
+                    style={{
+                      width: "36px",
+                      height: "36px",
+                      borderRadius: "50%",
+                      backgroundColor: "#333",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: "14px",
+                      fontWeight: "bold",
+                      color: "#fff"
+                    }}
+                  >
+                    {userName ? userName.charAt(0).toUpperCase() : "U"}
+                  </div>
+                )}
+                <span style={{ fontWeight: "600", fontSize: "14px", color: "#ffffff" }}>
+                  @{userName}
+                </span>
+              </div>
             </div>
-            
-            {/* Small Date Divider Line */}
-            <div style={{ display: "flex", alignItems: "center", width: "100%", margin: "8px 0" }}>
-              <div style={{ height: "1px", backgroundColor: "#333333", flex: 1 }}></div>
-              <span style={{ fontSize: "11px", color: "#666666", padding: "0 8px" }}>12th Jul 2026</span>
-              <div style={{ height: "1px", backgroundColor: "#333333", flex: 1 }}></div>
-            </div>
           </div>
         </div>
 
-        {/* Bottom Section: User Profile & Branding */}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "4px" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <div style={{
-              width: "32px",
-              height: "32px",
-              borderRadius: "50%",
-              backgroundColor: "#222",
-              border: "1px solid #333"
-            }}></div>
-            <span style={{ fontSize: "14px", fontWeight: "600", color: "#e0e0e0" }}>
-              @{userName || "Nikhil125"}
-            </span>
-          </div>
-          
-          <div style={{ fontWeight: "800", fontSize: "15px", letterSpacing: "1px", color: "#ffffff" }}>
-            🎬 CINERATE
-          </div>
-        </div>
-      </div>
-
-        <div className="share-actions">
-          <button className="share-btn wa" onClick={shareWhatsApp} disabled={sharing}>
-            <span>📱</span> WhatsApp / Instagram
+        {/* Buttons */}
+        <div style={{ display: "flex", gap: "12px", marginTop: "16px" }}>
+          <button className="share-btn whatsapp" onClick={shareWhatsApp} disabled={sharing}>
+            <span>WhatsApp</span>
           </button>
-          <button className="share-btn dl" onClick={downloadCard} disabled={sharing}>
-            <span>⬇</span> Download Image
+          <button className="share-btn download" onClick={downloadCard} disabled={sharing}>
+            <span>Download</span>
           </button>
         </div>
-        <p className="share-hint">Download the image and post it as your Instagram or WhatsApp Status!</p>
       </div>
     </div>
   );
@@ -587,11 +600,12 @@ const handlePhotoChange = (e) => {
 
       {shareData && (
         <ShareCard
-          movie={shareData.movie}
-          userRating={shareData.rating}
-          userName={user?.displayName || user?.email}
-          onClose={() => setShareData(null)}
-        />
+  movie={shareData.movie}
+  userRating={shareData.rating}
+  userName={user?.displayName || user?.email}
+  userPhoto={user?.photoURL || localStorage.getItem(`user_photo_${user?.uid}`)}
+  onClose={() => setShareData(null)}
+/>
       )}
 
       {showAdmin && isAdmin && (
