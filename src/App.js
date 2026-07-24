@@ -435,9 +435,8 @@ const handlePhotoChange = (e) => {
       img.src = event.target.result;
 
       img.onload = () => {
-        // Photo ko compress/resize karne ke liye canvas format
         const canvas = document.createElement("canvas");
-        const MAX_WIDTH = 200; // Small size for fast upload
+        const MAX_WIDTH = 150; // Standard avatar size
         const scaleFactor = MAX_WIDTH / img.width;
         canvas.width = MAX_WIDTH;
         canvas.height = img.height * scaleFactor;
@@ -445,25 +444,25 @@ const handlePhotoChange = (e) => {
         const ctx = canvas.getContext("2d");
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-        // Compressed Base64 String
-        const compressedBase64 = canvas.toDataURL("image/jpeg", 0.7);
+        // Compress Image
+        const compressedBase64 = canvas.toDataURL("image/jpeg", 0.6);
 
+        // 1. Local Storage mein save karo (bina Firebase length limit ki tension ke)
         if (auth.currentUser) {
-          updateProfile(auth.currentUser, { photoURL: compressedBase64 })
-            .then(() => {
-              setUser({ ...auth.currentUser, photoURL: compressedBase64 });
-              alert("Profile photo kamyabi se badal gayi hai! 🎉");
-            })
-            .catch((err) => {
-              console.error("Firebase update error:", err);
-              alert("Error: " + err.message);
-            });
+          localStorage.setItem(`user_photo_${auth.currentUser.uid}`, compressedBase64);
+          
+          // 2. React State instant update karo
+          setUser((prev) => ({
+            ...prev,
+            photoURL: compressedBase64
+          }));
+
+          alert("Profile photo kamyabi se badal gayi hai! 🎉");
         }
       };
     };
     reader.readAsDataURL(file);
   };
-
 
   const handleRate = async (movie, score, reviewText = "") => {
     if (!user) return;
